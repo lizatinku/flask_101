@@ -1,12 +1,13 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for
 from .models import User
 from werkzeug.security import generate_password_hash, check_password_hash
-from . import db   ##means from __init__.py import db
+from . import db   #means from __init__.py import db
 from flask_login import login_user, login_required, logout_user, current_user
 
-
+# when u generate a hash, we pass the password to hashing function and it spits out some y.
+# idea is that we are never storing a password
+# we use flask login so that when a user is logged on onky, they can see the home page. When not logged in, they should see login biutton on top. 
 auth = Blueprint('auth', __name__)
-
 
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
@@ -34,16 +35,16 @@ def logout():
     logout_user()
     return redirect(url_for('auth.login'))
 
-
 @auth.route('/sign-up', methods=['GET', 'POST'])
 def sign_up():
-    if request.method == 'POST':
+    if request.method == 'POST':         # used to check if the current HTTP request sent to the server is of the POST method
         email = request.form.get('email')
         first_name = request.form.get('firstName')
         password1 = request.form.get('password1')
         password2 = request.form.get('password2')
 
         user = User.query.filter_by(email=email).first()
+        # below are different error messages
         if user:
             flash('Email already exists.', category='error')
         elif len(email) < 4:
@@ -61,6 +62,6 @@ def sign_up():
             db.session.commit()
             login_user(new_user, remember=True)
             flash('Account created!', category='success')
-            return redirect(url_for('views.home'))
+            return redirect(url_for('views.home')) #
 
     return render_template("sign_up.html", user=current_user)

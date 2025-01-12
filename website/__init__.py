@@ -6,7 +6,6 @@ from flask_login import LoginManager
 db = SQLAlchemy()
 DB_NAME = "database.db"
 
-
 def create_app():
     app = Flask(__name__)
     app.config['SECRET_KEY'] = 'hjshjhdjah kjshkjdhjs'
@@ -29,12 +28,14 @@ def create_app():
     login_manager.init_app(app)
 
     @login_manager.user_loader
+    # User.query.get is like filter and looks for the primary key
     def load_user(id):
         return User.query.get(int(id))
 
     return app
 
 
+# we are checking if the database exists and if not we are creating it, also keep in mind SQLAlchemy url in mind
 def create_database(app):
     if not path.exists('website/' + DB_NAME):
         db.create_all(app=app)
